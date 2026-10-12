@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface UserRepo extends JpaRepository<UserEntity, String> {
-    Optional<UserEntity> findByEmail(String email);
-    boolean existsByEmail(String email);
+    Optional<UserEntity> findByUsername(String username);
+    boolean existsByUsername(String username);
     @Modifying
     @Transactional
     @Query(value = "delete from t_user where deleted_at is not null", nativeQuery = true)

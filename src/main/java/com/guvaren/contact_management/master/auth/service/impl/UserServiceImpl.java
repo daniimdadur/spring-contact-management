@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
                 .id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .email(user.getEmail())
+                .username(user.getUsername())
                 .roles(user.getRoles().stream().map(RoleEntity::getRole).collect(Collectors.toSet()))
                 .build();
     }

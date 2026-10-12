@@ -38,14 +38,14 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthenticationResult register(RegistrationReq req) {
-        this.userRepo.findByEmail(req.getEmail()).ifPresent(duplicate -> {
-            throw new DuplicateException("Email already exists");
+        this.userRepo.findByUsername(req.getUsername()).ifPresent(duplicate -> {
+            throw new DuplicateException("Username already exists");
         });
         UserEntity user = UserEntity.builder()
                 .id(CommonUtil.getUUID())
                 .firstName(req.getFirstName())
                 .lastName(req.getLastName())
-                .email(req.getEmail())
+                .username(req.getUsername())
                 .password(passwordEncoder.encode(req.getPassword()))
                 .build();
         RoleEntity userRole = this.roleRepo.findByRole(Roles.USER)
@@ -64,13 +64,13 @@ public class AuthServiceImpl implements AuthService {
     public AuthenticationResult login(AuthenticationReq req) {
         this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        req.getEmail(),
+                        req.getUsername(),
                         req.getPassword()
                 )
         );
 
-        UserEntity user = this.userRepo.findByEmail(req.getEmail())
-                .orElseThrow(() -> new NotFoundException("User not found with email: " + req.getEmail()));
+        UserEntity user = this.userRepo.findByUsername(req.getUsername())
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + req.getUsername()));
         return generateAuthenticationRes(user);
     }
 
@@ -78,20 +78,20 @@ public class AuthServiceImpl implements AuthService {
     public AuthenticationResult loginAndLogoutForAllDevices(AuthenticationReq req) {
         this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        req.getEmail(),
+                        req.getUsername(),
                         req.getPassword()
                 )
         );
 
-        UserEntity user = this.userRepo.findByEmail(req.getEmail())
-                .orElseThrow(() -> new NotFoundException("User not found with email: " + req.getEmail()));
+        UserEntity user = this.userRepo.findByUsername(req.getUsername())
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + req.getUsername()));
         return generateAuthenticationAndLogoutRes(user);
     }
 
     @Override
     public TokenRes getNewAccessToken(String refreshToken) {
         RefreshTokenEntity refreshTokenEntity = this.refreshTokenService.getValidRefreshToken(refreshToken);
-        String accessToken = this.accessJwtService.generateAccessToken(refreshTokenEntity.getUser().getEmail());
+        String accessToken = this.accessJwtService.generateAccessToken(refreshTokenEntity.getUser().getUsername());
         return TokenRes.builder()
                 .accessToken(accessToken)
                 .accessTokenExpiration(this.accessJwtService.getRemainingMinutes(accessToken))
@@ -114,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private AuthenticationResult generateAuthenticationRes(UserEntity user){
-        String accessToken = this.accessJwtService.generateAccessToken(user.getEmail());
+        String accessToken = this.accessJwtService.generateAccessToken(user.getUsername());
         String refreshToken = this.refreshTokenService.generateAdditionalRefreshToken(user);
         return AuthenticationResult.builder()
                 .accessToken(accessToken)
@@ -126,7 +126,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private AuthenticationResult generateAuthenticationAndLogoutRes(UserEntity user){
-        String accessToken = this.accessJwtService.generateAccessToken(user.getEmail());
+        String accessToken = this.accessJwtService.generateAccessToken(user.getUsername());
         String refreshToken = this.refreshTokenService.generateRefreshToken(user);
         return AuthenticationResult.builder()
                 .accessToken(accessToken)

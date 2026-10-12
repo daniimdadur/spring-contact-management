@@ -20,11 +20,26 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final List<String> PUBLIC_PATHS = List.of(
+            "/api/v1/auth/register",
+            "/api/v1/auth/login",
+            "/api/v1/auth/login-logout",
+            "/api/v1/auth/logout",
+            "/api/v1/auth/logout-all-devices",
+            "/api/v1/auth/refresh-token",
+            "/swagger-ui",
+            "/swagger-ui.html",
+            "/api-docs",
+            "/v3/api-docs"
+    );
+
     private final CustomUserDetailsService userDetailsService;
     private final AccessJwtService accessJwtService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -34,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        if (isAuthEndpoint(request)) {
+        if (isPublicEndpoint(request)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -82,14 +97,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean isAuthEndpoint(HttpServletRequest request) {
+    private boolean isPublicEndpoint(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.contains("/api/v1/auth/register") ||
-                path.contains("/api/v1/auth/login") ||
-                path.contains("/api/v1/auth/login-logout") ||
-                path.contains("/api/v1/auth/logout") ||
-                path.contains("/api/v1/auth/logout-all-devices") ||
-                path.contains("/api/v1/auth/refresh-token");
+        return PUBLIC_PATHS.stream().anyMatch(path::startsWith);
     }
 
     private String extractJwtFromRequest(HttpServletRequest request) {

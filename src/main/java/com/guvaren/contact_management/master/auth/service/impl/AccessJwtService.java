@@ -33,8 +33,8 @@ public class AccessJwtService {
     }
 
     //auth service
-    public String generateAccessToken(String email) {
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
+    public String generateAccessToken(String username) {
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
         Map<String, Object> claims = Map.of("type", "access");
         return Jwts.builder()
                 .claims(claims)

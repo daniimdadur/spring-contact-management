@@ -14,6 +14,6 @@ public class UserRes {
     private String id;
     private String firstName;
     private String lastName;
-    private String email;
+    private String username;
     private Set<Roles> roles;
 }

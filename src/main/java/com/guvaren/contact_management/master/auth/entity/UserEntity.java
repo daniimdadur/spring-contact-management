@@ -26,8 +26,8 @@ public class UserEntity extends BaseAuditableSoftDelete {
     @Column(name = "last_name", length = 64)
     private String lastName;
 
-    @Column(name = "email", length = 100)
-    private String email;
+    @Column(name = "username", length = 100)
+    private String username;
 
     @Column(name = "password", length = 64)
     private String password;

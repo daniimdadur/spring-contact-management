@@ -14,8 +14,8 @@ import java.util.Optional;
 public interface RefreshTokenRepo extends JpaRepository<RefreshTokenEntity, String> {
     Optional<RefreshTokenEntity> findByToken(String token);
     @Modifying
-    @Query("update RefreshTokenEntity r set r.revoked = true where r.user.email = :email")
-    void revokeAllUserTokens(@Param("email") String email);
+    @Query("update RefreshTokenEntity r set r.revoked = true where r.user.username = :username")
+    void revokeAllUserTokens(@Param("username") String username);
     List<RefreshTokenEntity> findAllByUserAndRevokedFalse(UserEntity user);
     int deleteByExpiredBefore(LocalDateTime date);
 }

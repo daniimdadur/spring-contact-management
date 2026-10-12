@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @NonNull
     public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
-        UserEntity user = this.userRepo.findByEmail(username)
+        UserEntity user = this.userRepo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
         Collection<GrantedAuthority> authorities = new HashSet<>();
@@ -35,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         });
 
         return new User(
-                user.getEmail(),
+                user.getUsername(),
                 user.getPassword(),
                 authorities
         );
